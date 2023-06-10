@@ -15,6 +15,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import Pagination from '@mui/material/Pagination';
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 
@@ -25,6 +26,7 @@ const CoinsTable = () => {
   const [coins, setCoins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const { currency, symbol } = CryptoState();
 
   const useStyles = makeStyles({
@@ -49,7 +51,7 @@ const CoinsTable = () => {
     setCoins(data);
     setLoading(false);
   };
-  console.log(coins);
+  
 
   useEffect(() => {
     fetchCoins();
@@ -94,7 +96,7 @@ const CoinsTable = () => {
           {loading ? (
             <LinearProgress style={{ backgroundColor: "gold" }} />
           ) : (
-            <Table>
+            <Table aria-label="simple table">
               <TableHead style={{ backgroundColor: "#EEBC1D" }}>
                 <TableRow>
                   {["Coin", "Price", "24h Change", "Market Cap"].map((head) => (
@@ -113,7 +115,7 @@ const CoinsTable = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {handleSearch().map((row) => {
+                {handleSearch().slice((page - 1) * 10, (page - 1) * 10 + 10).map((row) => {
                   const profit = row.price_change_percentage_24h > 0;
                   return (
                     <TableRow
@@ -177,6 +179,21 @@ const CoinsTable = () => {
             </Table>
           )}
         </TableContainer>
+
+        <Pagination
+          count={(handleSearch()?.length / 10).toFixed(0)}
+          style={{
+            padding: 20,
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+          }}
+          classes={{ ul: classes.pagination }}
+          onChange={(_, value) => {
+            setPage(value);
+            window.scroll(0, 450);
+          }}
+        />
       </Container>
     </ThemeProvider>
   );
